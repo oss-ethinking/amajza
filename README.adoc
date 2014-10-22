@@ -1,0 +1,3 @@
+== Amajza Introductin
+
+Amajza bundles common used taglibs for java webapplications.
