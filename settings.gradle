@@ -1,2 +1,3 @@
 include 'amajza-date'
+include 'amajza-json'
 

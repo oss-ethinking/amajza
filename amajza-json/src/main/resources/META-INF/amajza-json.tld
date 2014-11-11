@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+    
+  <description>Amajza JSON library</description>
+  <display-name>Amajza JSON</display-name>
+  <tlib-version>1.1</tlib-version>
+  <short-name>aj</short-name>
+  <uri>http://ethinking.de/jsp/amajza/json/1.0</uri>
+
+  <tag>
+    <description>
+        Encapsulate a JSON object that can have entries and arrays
+    </description>
+    <name>object</name>
+    <tag-class>de.ethinking.amajza.json.tags.JsonObjectTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+
+  <tag>
+    <description>
+        Add an entry to a surrounding JSON object
+    </description>
+    <name>entry</name>
+    <tag-class>de.ethinking.amajza.json.tags.JsonEntryTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+        <description>
+        </description>
+        <name>type</name>
+        <required>false</required>
+        <rtexprvalue>false</rtexprvalue>
+        <type>de.ethinking.amajza.json.tags.JsonEntryType</type>
+    </attribute>
+  </tag>
+</taglib>
