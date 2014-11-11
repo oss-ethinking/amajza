@@ -1,6 +1,8 @@
+.metadata
 .gradle
 .classpath
 .project
 .settings
 build
 
+/RemoteSystemsTempFiles/
