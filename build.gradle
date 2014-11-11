@@ -1,7 +1,13 @@
 apply plugin: 'eclipse'
 
+
 subprojects{
 	apply plugin: 'eclipse'
 	apply plugin: 'java'
 	repositories{ mavenCentral() }
+}
+
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.2'
 }
