@@ -1,10 +1,18 @@
 package de.ethinking.amajza.json.tags;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import javax.servlet.jsp.tagext.BodyContent;
+
 import junit.framework.TestCase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.springframework.mock.web.MockBodyContent;
 import org.springframework.mock.web.MockPageContext;
 
 public class JsonTagsTest extends TestCase {
@@ -38,6 +46,8 @@ public class JsonTagsTest extends TestCase {
         parent.appendEntryTag().withName("testTrue").withValue("true").withType(JsonEntryType.BOOLEAN);
         parent.appendEntryTag().withName("testNumber").withValue("1").withType(JsonEntryType.NUMBER);
         parent.appendEntryTag().withName("testFloat").withValue("1.1").withType(JsonEntryType.FLOAT);
+        MockBodyContent bodyContent = new MockBodyContent("{ \"bodyContent\" : \"value\" }", new StringWriter());
+        parent.getTag().setBodyContent(bodyContent);
 
         parent = parentArray.appendObjectTag();
         parent.appendEntryTag().withName("testTrue").withValue("false").withType(JsonEntryType.BOOLEAN);
@@ -61,6 +71,7 @@ public class JsonTagsTest extends TestCase {
         Assert.assertTrue(result.getJSONObject(0).getBoolean("testTrue"));
         Assert.assertEquals(1, result.getJSONObject(0).getLong("testNumber"));
         Assert.assertEquals(1.1d, result.getJSONObject(0).getDouble("testFloat"), 0.0d);
+        Assert.assertEquals("value", result.getJSONObject(0).getString("bodyContent"));
 
         Assert.assertFalse(result.getJSONObject(1).getBoolean("testTrue"));
         Assert.assertEquals(2, result.getJSONObject(1).getLong("testNumber"));

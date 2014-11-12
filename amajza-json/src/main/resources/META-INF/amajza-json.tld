@@ -57,7 +57,7 @@
         <description>
             Add an array entry to a surrounding JSON object
         </description>
-        <name>entry</name>
+        <name>array</name>
         <tag-class>de.ethinking.amajza.json.tags.JsonArrayTag</tag-class>
         <body-content>JSP</body-content>
     </tag>
