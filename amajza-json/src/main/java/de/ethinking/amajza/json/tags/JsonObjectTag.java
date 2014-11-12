@@ -1,6 +1,7 @@
 package de.ethinking.amajza.json.tags;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
@@ -23,9 +24,17 @@ public class JsonObjectTag extends BodyTagSupport {
     public int doEndTag() throws JspException {
         BodyContent bodyContent = getBodyContent();
         if (bodyContent != null) {
-            JSONObject bodyJson = new JSONObject(bodyContent.getString()); 
-            for (Object key : bodyJson.keySet()) {
-                jsonObject.putOnce((String) key, bodyJson.get((String) key));
+            try {
+                JSONObject bodyJson = new JSONObject(bodyContent.getString());
+                for (@SuppressWarnings("unchecked")
+                Iterator<String> it = bodyJson.keys(); it.hasNext();) {
+                    String key = it.next();
+                    if (jsonObject.opt(key) == null) {
+                        jsonObject.put(key, bodyJson.get(key));
+                    }
+                }
+            } catch (Exception e) {
+                throw new JspException(e);
             }
         }
         // if has parent, add object there, else render json string to page
