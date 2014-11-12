@@ -13,6 +13,7 @@ public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag 
     Object value;
     JsonEntryType type;
     JSONObject jsonObject;
+    boolean parse = false;
 
     @Override
     public int doStartTag() throws JspException {
@@ -27,37 +28,57 @@ public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag 
 
     @Override
     public int doEndTag() throws JspException {
-        if (value == null) {
-            BodyContent bodyContent = getBodyContent();
-            if (bodyContent != null) {
-                value = getBodyContent().getString();
-            }
-        }
-        if (value != null) {
-            try {
-                if (type != null && !(value instanceof JSONObject) && !(value instanceof JSONArray)) {
-                    switch (type) {
-                    case BOOLEAN:
-                        jsonObject.put(name, Boolean.parseBoolean(value.toString()));
-                        break;
-                    case FLOAT:
-                        jsonObject.put(name, Double.parseDouble(value.toString()));
-                        break;
-                    case NUMBER:
-                        jsonObject.put(name, Long.parseLong(value.toString()));
-                        break;
-                    case STRING:
-                        jsonObject.put(name, value.toString());
-                        break;
+        try {
+            if (value == null) {
+                BodyContent bodyContent = getBodyContent();
+                if (bodyContent != null) {
+                    try {
+                        String body = getBodyContent().getString();
+                        if (parse) {
+                            body = body.trim();
+                            if (body.startsWith("{")) {
+                                value = new JSONObject(body);
+                            } else if (body.startsWith("[")) {
+                                value = new JSONArray(body);
+                            } else {
+                                value = body;
+                            }
+                        } else {
+                            value = body;
+                        }
+                    } catch (Exception e) {
+                        throw new JspException("failed in JSON entry [" + name + "] body: " + bodyContent.getString(), e);
                     }
-                } else {
-                    jsonObject.put(name, value);
                 }
-            } catch (Exception e) {
-                throw new JspException(e);
             }
+            if (value != null) {
+                try {
+                    if (type != null && !(value instanceof JSONObject) && !(value instanceof JSONArray)) {
+                        switch (type) {
+                        case BOOLEAN:
+                            jsonObject.put(name, Boolean.parseBoolean(value.toString()));
+                            break;
+                        case FLOAT:
+                            jsonObject.put(name, Double.parseDouble(value.toString()));
+                            break;
+                        case NUMBER:
+                            jsonObject.put(name, Long.parseLong(value.toString()));
+                            break;
+                        case STRING:
+                            jsonObject.put(name, value.toString());
+                            break;
+                        }
+                    } else {
+                        jsonObject.put(name, value);
+                    }
+                } catch (Exception e) {
+                    throw new JspException(e);
+                }
+            }
+            return super.doEndTag();
+        } finally {
+            release();
         }
-        return super.doEndTag();
     }
 
     @Override
@@ -67,6 +88,7 @@ public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag 
         value = null;
         type = null;
         jsonObject = null;
+        parse = false;
     }
 
     public void setType(JsonEntryType type) {
@@ -79,6 +101,10 @@ public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag 
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public void setParse(boolean parseBody) {
+        this.parse = parseBody;
     }
 
     @Override

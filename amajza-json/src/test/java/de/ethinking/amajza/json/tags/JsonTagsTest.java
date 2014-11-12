@@ -46,13 +46,15 @@ public class JsonTagsTest extends TestCase {
         parent.appendEntryTag().withName("testTrue").withValue("true").withType(JsonEntryType.BOOLEAN);
         parent.appendEntryTag().withName("testNumber").withValue("1").withType(JsonEntryType.NUMBER);
         parent.appendEntryTag().withName("testFloat").withValue("1.1").withType(JsonEntryType.FLOAT);
-        MockBodyContent bodyContent = new MockBodyContent("{ \"bodyContent\" : \"value\" }", new StringWriter());
+        MockBodyContent bodyContent = new MockBodyContent(" { \"bodyContent\" : \"value\" } ", new StringWriter());
         parent.getTag().setBodyContent(bodyContent);
 
         parent = parentArray.appendObjectTag();
         parent.appendEntryTag().withName("testTrue").withValue("false").withType(JsonEntryType.BOOLEAN);
         parent.appendEntryTag().withName("testNumber").withValue("2").withType(JsonEntryType.NUMBER);
         parent.appendEntryTag().withName("testFloat").withValue("1.2").withType(JsonEntryType.FLOAT);
+        bodyContent = new MockBodyContent("", new StringWriter());
+        parent.getTag().setBodyContent(bodyContent);
         JsonArrayTagBuilder childArrayParent = parent.appendEntryTag().withName("testEntries").appendArrayTag();
 
         parent = childArrayParent.appendObjectTag();
@@ -68,18 +70,18 @@ public class JsonTagsTest extends TestCase {
 
         Assert.assertEquals(2, result.length());
 
-        Assert.assertTrue(result.getJSONObject(0).getBoolean("testTrue"));
-        Assert.assertEquals(1, result.getJSONObject(0).getLong("testNumber"));
-        Assert.assertEquals(1.1d, result.getJSONObject(0).getDouble("testFloat"), 0.0d);
-        Assert.assertEquals("value", result.getJSONObject(0).getString("bodyContent"));
+        Assert.assertTrue(result.getJSONObject(0).optBoolean("testTrue"));
+        Assert.assertEquals(1, result.getJSONObject(0).optLong("testNumber"));
+        Assert.assertEquals(1.1d, result.getJSONObject(0).optDouble("testFloat"), 0.0d);
+        Assert.assertEquals("value", result.getJSONObject(0).optString("bodyContent"));
 
-        Assert.assertFalse(result.getJSONObject(1).getBoolean("testTrue"));
-        Assert.assertEquals(2, result.getJSONObject(1).getLong("testNumber"));
-        Assert.assertEquals(1.2d, result.getJSONObject(1).getDouble("testFloat"), 0.0d);
-        Assert.assertEquals(2, result.getJSONObject(1).getJSONArray("testEntries").length());
-        Assert.assertEquals(2.1d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(0).getDouble("testFloat1"), 0.0d);
-        Assert.assertEquals(2.2d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(0).getDouble("testFloat2"), 0.0d);
-        Assert.assertEquals(3.1d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(1).getDouble("testFloat1"), 0.0d);
-        Assert.assertEquals(3.2d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(1).getDouble("testFloat2"), 0.0d);
+        Assert.assertFalse(result.getJSONObject(1).optBoolean("testTrue"));
+        Assert.assertEquals(2, result.getJSONObject(1).optLong("testNumber"));
+        Assert.assertEquals(1.2d, result.getJSONObject(1).optDouble("testFloat"), 0.0d);
+        Assert.assertEquals(2, result.getJSONObject(1).optJSONArray("testEntries").length());
+        Assert.assertEquals(2.1d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(0).getDouble("testFloat1"), 0.0d);
+        Assert.assertEquals(2.2d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(0).getDouble("testFloat2"), 0.0d);
+        Assert.assertEquals(3.1d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(1).getDouble("testFloat1"), 0.0d);
+        Assert.assertEquals(3.2d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(1).getDouble("testFloat2"), 0.0d);
     }
 }

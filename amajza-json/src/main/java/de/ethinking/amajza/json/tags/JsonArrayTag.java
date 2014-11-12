@@ -40,7 +40,9 @@ public class JsonArrayTag extends BodyTagSupport implements JsonObjectParentTag 
 
     @Override
     public void setJsonObject(JSONObject jsonObject) {
-        jsonArray.put(jsonObject);
+        if (jsonObject.length()>0) {
+            jsonArray.put(jsonObject);
+        }
     }
 
     public JSONArray getJsonArray() {

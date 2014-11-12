@@ -22,36 +22,43 @@ public class JsonObjectTag extends BodyTagSupport {
 
     @Override
     public int doEndTag() throws JspException {
-        BodyContent bodyContent = getBodyContent();
-        if (bodyContent != null) {
-            try {
-                JSONObject bodyJson = new JSONObject(bodyContent.getString());
-                for (@SuppressWarnings("unchecked")
-                Iterator<String> it = bodyJson.keys(); it.hasNext();) {
-                    String key = it.next();
-                    if (jsonObject.opt(key) == null) {
-                        jsonObject.put(key, bodyJson.get(key));
+        try {
+            BodyContent bodyContent = getBodyContent();
+            if (bodyContent != null) {
+                try {
+                    String body = bodyContent.getString().trim();
+                    if (body.length() > 1) {
+                        JSONObject bodyJson = new JSONObject(bodyContent.getString());
+                        for (@SuppressWarnings("unchecked")
+                        Iterator<String> it = bodyJson.keys(); it.hasNext();) {
+                            String key = it.next();
+                            if (jsonObject.opt(key) == null) {
+                                jsonObject.put(key, bodyJson.get(key));
+                            }
+                        }
                     }
+                } catch (Exception e) {
+                    throw new JspException("failed in JSON object body: " + bodyContent.getString(), e);
                 }
-            } catch (Exception e) {
-                throw new JspException(e);
             }
-        }
-        // if has parent, add object there, else render json string to page
-        JsonObjectParentTag parentTag = null;
-        if (getParent() != null && (parentTag = (JsonObjectParentTag) findAncestorWithClass(this, JsonObjectParentTag.class)) != null) {
-            // parents of JsonObjectTag or JsonArrayTag need to be used
-            parentTag.setJsonObject(jsonObject);
-        } else {
-            try {
-                pageContext.getOut().print(jsonObject.toString(4));
-            } catch (JSONException e) {
-                throw new JspException(e);
-            } catch (IOException e) {
-                throw new JspException(e);
+            // if has parent, add object there, else render json string to page
+            JsonObjectParentTag parentTag = null;
+            if (getParent() != null && (parentTag = (JsonObjectParentTag) findAncestorWithClass(this, JsonObjectParentTag.class)) != null) {
+                // parents of JsonObjectTag or JsonArrayTag need to be used
+                parentTag.setJsonObject(jsonObject);
+            } else {
+                try {
+                    pageContext.getOut().print(jsonObject.toString(4));
+                } catch (JSONException e) {
+                    throw new JspException(e);
+                } catch (IOException e) {
+                    throw new JspException(e);
+                }
             }
+            return EVAL_PAGE;
+        } finally {
+            release();
         }
-        return EVAL_PAGE;
     }
 
     public JSONObject getJsonObject() {

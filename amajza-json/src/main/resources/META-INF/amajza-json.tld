@@ -51,6 +51,15 @@
             <rtexprvalue>true</rtexprvalue>
             <type>java.lang.Object</type>
         </attribute>
+        <attribute>
+            <description>
+                Parse tag body content as JSON
+            </description>
+            <name>parse</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>boolean</type>
+        </attribute>
     </tag>
 
     <tag>
