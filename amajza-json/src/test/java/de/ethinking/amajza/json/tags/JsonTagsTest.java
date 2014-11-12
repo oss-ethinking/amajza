@@ -2,6 +2,7 @@ package de.ethinking.amajza.json.tags;
 
 import junit.framework.TestCase;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.springframework.mock.web.MockPageContext;
@@ -52,6 +53,22 @@ public class JsonTagsTest extends TestCase {
         parent.appendEntryTag().withName("testFloat2").withValue("3.2").withType(JsonEntryType.FLOAT);
 
         tagBuilder.invokeTags();
-        System.out.println(mockPageContext.getContentAsString());
+
+        JSONArray result = new JSONArray(mockPageContext.getContentAsString());
+
+        Assert.assertEquals(2, result.length());
+
+        Assert.assertTrue(result.getJSONObject(0).getBoolean("testTrue"));
+        Assert.assertEquals(1, result.getJSONObject(0).getLong("testNumber"));
+        Assert.assertEquals(1.1d, result.getJSONObject(0).getDouble("testFloat"), 0.0d);
+
+        Assert.assertFalse(result.getJSONObject(1).getBoolean("testTrue"));
+        Assert.assertEquals(2, result.getJSONObject(1).getLong("testNumber"));
+        Assert.assertEquals(1.2d, result.getJSONObject(1).getDouble("testFloat"), 0.0d);
+        Assert.assertEquals(2, result.getJSONObject(1).getJSONArray("testEntries").length());
+        Assert.assertEquals(2.1d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(0).getDouble("testFloat1"), 0.0d);
+        Assert.assertEquals(2.2d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(0).getDouble("testFloat2"), 0.0d);
+        Assert.assertEquals(3.1d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(1).getDouble("testFloat1"), 0.0d);
+        Assert.assertEquals(3.2d, result.getJSONObject(1).getJSONArray("testEntries").getJSONObject(1).getDouble("testFloat2"), 0.0d);
     }
 }

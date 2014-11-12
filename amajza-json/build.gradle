@@ -1,3 +1,4 @@
+group = 'de.ethinking.amajza'
 version = '1.0'
 
 dependencies {
