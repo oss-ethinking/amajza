@@ -12,11 +12,16 @@ import org.json.JSONObject;
 
 public class JsonObjectTag extends BodyTagSupport {
 
+    public static final String ENCLOSING_JSON_OBJECT = "de.ethinking.amajza.json.parent_json_object";
+
     private JSONObject jsonObject;
+    private Object oldEnclosing;
 
     @Override
     public int doStartTag() throws JspException {
         jsonObject = new JSONObject();
+        oldEnclosing = pageContext.getRequest().getAttribute(ENCLOSING_JSON_OBJECT);
+        pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, this);
         return EVAL_BODY_BUFFERED;
     }
 
@@ -58,6 +63,7 @@ public class JsonObjectTag extends BodyTagSupport {
             return EVAL_PAGE;
         } finally {
             release();
+            pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, oldEnclosing);
         }
     }
 

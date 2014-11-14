@@ -18,6 +18,10 @@ public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag 
     @Override
     public int doStartTag() throws JspException {
         JsonObjectTag parentObjectTag = (JsonObjectTag) findAncestorWithClass(this, JsonObjectTag.class);
+        if (parentObjectTag == null) {
+            // try to find in scope
+            parentObjectTag = (JsonObjectTag) pageContext.getRequest().getAttribute(JsonObjectTag.ENCLOSING_JSON_OBJECT);
+        }
         if (parentObjectTag != null) {
             jsonObject = parentObjectTag.getJsonObject();
         } else {
