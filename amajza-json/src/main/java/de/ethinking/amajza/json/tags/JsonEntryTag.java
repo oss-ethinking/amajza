@@ -2,25 +2,28 @@ package de.ethinking.amajza.json.tags;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
-import javax.servlet.jsp.tagext.BodyTagSupport;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag {
+public class JsonEntryTag extends AbstractJsonTag implements JsonObjectParentTag {
 
-    String name;
-    Object value;
-    JsonEntryType type;
-    JSONObject jsonObject;
-    boolean parse = false;
+    private String name;
+    private Object value;
+    private JsonEntryType type;
+    private JSONObject jsonObject;
+    private boolean parse = false;
+    private Object oldEnclosing;
 
     @Override
     public int doStartTag() throws JspException {
+        oldEnclosing = pageContext.getRequest().getAttribute(ENCLOSING_JSON_OBJECT);
+        pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, this);
+
         JsonObjectTag parentObjectTag = (JsonObjectTag) findAncestorWithClass(this, JsonObjectTag.class);
         if (parentObjectTag == null) {
             // try to find in scope
-            parentObjectTag = (JsonObjectTag) pageContext.getRequest().getAttribute(JsonObjectTag.ENCLOSING_JSON_OBJECT);
+            parentObjectTag = (JsonObjectTag) oldEnclosing;
         }
         if (parentObjectTag != null) {
             jsonObject = parentObjectTag.getJsonObject();
@@ -51,7 +54,7 @@ public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag 
                             value = body;
                         }
                     } catch (Exception e) {
-                        throw new JspException("failed in JSON entry [" + name + "] body: " + bodyContent.getString(), e);
+                        LOG.error("failed in JSON entry [" + name + "] body: " + bodyContent.getString(), e);
                     }
                 }
             }
@@ -82,6 +85,7 @@ public class JsonEntryTag extends BodyTagSupport implements JsonObjectParentTag 
             return super.doEndTag();
         } finally {
             release();
+            pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, oldEnclosing);
         }
     }
 

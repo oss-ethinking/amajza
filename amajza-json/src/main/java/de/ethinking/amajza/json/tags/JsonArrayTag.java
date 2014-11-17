@@ -4,19 +4,21 @@ import java.io.IOException;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
-import javax.servlet.jsp.tagext.BodyTagSupport;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonArrayTag extends BodyTagSupport implements JsonObjectParentTag {
+public class JsonArrayTag extends AbstractJsonTag implements JsonObjectParentTag {
 
     private JSONArray jsonArray;
+    private Object oldEnclosing;
 
     @Override
     public int doStartTag() throws JspException {
         jsonArray = new JSONArray();
+        oldEnclosing = pageContext.getRequest().getAttribute(ENCLOSING_JSON_OBJECT);
+        pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, this);
         return EVAL_BODY_BUFFERED;
     }
 
@@ -34,7 +36,7 @@ public class JsonArrayTag extends BodyTagSupport implements JsonObjectParentTag 
                         }
                     }
                 } catch (Exception e) {
-                    throw new JspException("failed in JSON object body: " + bodyContent.getString(), e);
+                    LOG.error("failed in JSON object body: " + bodyContent.getString(), e);
                 }
             }
             // if has parent, add object there, else render json string to page
@@ -54,6 +56,7 @@ public class JsonArrayTag extends BodyTagSupport implements JsonObjectParentTag 
             return EVAL_PAGE;
         } finally {
             release();
+            pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, oldEnclosing);
         }
     }
 

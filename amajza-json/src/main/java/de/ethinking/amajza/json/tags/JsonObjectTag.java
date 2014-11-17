@@ -5,14 +5,11 @@ import java.util.Iterator;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyContent;
-import javax.servlet.jsp.tagext.BodyTagSupport;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonObjectTag extends BodyTagSupport {
-
-    public static final String ENCLOSING_JSON_OBJECT = "de.ethinking.amajza.json.parent_json_object";
+public class JsonObjectTag extends AbstractJsonTag {
 
     private JSONObject jsonObject;
     private Object oldEnclosing;
@@ -43,12 +40,15 @@ public class JsonObjectTag extends BodyTagSupport {
                         }
                     }
                 } catch (Exception e) {
-                    throw new JspException("failed in JSON object body: " + bodyContent.getString(), e);
+                    LOG.error("failed in JSON object body: " + bodyContent.getString(), e);
                 }
             }
             // if has parent, add object there, else render json string to page
-            JsonObjectParentTag parentTag = null;
-            if (getParent() != null && (parentTag = (JsonObjectParentTag) findAncestorWithClass(this, JsonObjectParentTag.class)) != null) {
+            JsonObjectParentTag parentTag = (JsonObjectParentTag) findAncestorWithClass(this, JsonObjectParentTag.class);
+            if (parentTag == null && oldEnclosing instanceof JsonObjectParentTag) {
+                parentTag = (JsonObjectParentTag) oldEnclosing;
+            }
+            if (parentTag != null) {
                 // parents of JsonObjectTag or JsonArrayTag need to be used
                 parentTag.setJsonObject(jsonObject);
             } else {
