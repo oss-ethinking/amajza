@@ -1,0 +1,25 @@
+== Amajza JSON
+
+A tag lib to create JSON output
+
+= Example
+
+[source,xml]
+----
+<%@ page language="java" contentType="application/json;UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://ethinking.de/amajza/json/1.0" prefix="json"%>
+<json:object>
+    <json:entry name="title" value="${title}"/>
+    <json:entry name="data">
+        <json:array>
+            <c:forEach var="entry" items="${data}">
+                <json:object>
+                    <json:entry name="key" value="${entry.key}"/>
+                    <json:entry name="data" parse="true">${entry.value}</json:entry>
+                </json:object>
+            </c:forEach>
+        </json:array>
+    </json:entry>
+</json:object>
+----
