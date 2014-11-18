@@ -2,7 +2,22 @@
 
 A tag lib to create JSON output
 
-= Example
+=== Tags
+
+==== <json:object>
+
+Start a new JSON object entry. Body can be multiple <json:entry> tags. Parent can be none (for root object), <json:entry> or <json:array>. 
+
+==== <json:entry>
+
+Add an entry to an JSON object. Must have a <json:object> parent somewhere in tag hierarchy. Body can be a value (parseable JSON as text is possible), <json:object> or <json:array>.  
+Optional entry type can be specified: BOOLEAN, STRING, NUMBER, FLOAT.
+
+==== <json:array>
+
+Define an entry's value to be an array of objects, or a root array. Body can be <json:object>'s.
+
+=== Example
 
 [source,xml]
 ----
@@ -20,6 +35,13 @@ A tag lib to create JSON output
                 </json:object>
             </c:forEach>
         </json:array>
+    </json:entry>
+    <json:entry name="meta">
+        <json:object>
+            <json:entry name="version" value="1" type="NUMBER"/>
+            <json:entry name="platform" value="*nix"/>
+            <json:entry name="valid" value="true" type="BOOLEAN"/>
+        <json:object>
     </json:entry>
 </json:object>
 ----
