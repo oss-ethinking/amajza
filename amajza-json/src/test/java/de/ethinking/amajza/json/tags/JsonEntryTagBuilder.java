@@ -1,6 +1,7 @@
 package de.ethinking.amajza.json.tags;
 
 import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.BodyContent;
 
 public class JsonEntryTagBuilder extends AbstractJsonTagBuilder<JsonEntryTag> {
 
@@ -23,6 +24,11 @@ public class JsonEntryTagBuilder extends AbstractJsonTagBuilder<JsonEntryTag> {
         return this;
     }
 
+    public JsonEntryTagBuilder withTagContent(BodyContent content) {
+        getTag().setParse(true);
+        getTag().setBodyContent(content);
+        return this;
+    }
     public JsonArrayTagBuilder appendArrayTag() {
         return addTag(new JsonArrayTagBuilder(getPageContext()), this);
     }

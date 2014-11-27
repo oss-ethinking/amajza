@@ -41,28 +41,27 @@ public class JsonTagsTest extends TestCase {
         parent.appendEntryTag().withName("testTrue").withValue("true").withType(JsonEntryType.BOOLEAN);
         parent.appendEntryTag().withName("testNumber").withValue("1").withType(JsonEntryType.NUMBER);
         parent.appendEntryTag().withName("testFloat").withValue("1.1").withType(JsonEntryType.FLOAT);
-        MockBodyContent bodyContent = new MockBodyContent(" { \"bodyContent\" : \"value\" } ", new StringWriter());
-        parent.getTag().setBodyContent(bodyContent);
+        parent.getTag().setBodyContent(new MockBodyContent(" { \"bodyContent\" : \"value\" } ", new StringWriter()));
 
         parent = parentArray.appendObjectTag();
         parent.appendEntryTag().withName("testTrue").withValue("false").withType(JsonEntryType.BOOLEAN);
         parent.appendEntryTag().withName("testNumber").withValue("2").withType(JsonEntryType.NUMBER);
         parent.appendEntryTag().withName("testFloat").withValue("1.2").withType(JsonEntryType.FLOAT);
-        bodyContent = new MockBodyContent("", new StringWriter());
-        parent.getTag().setBodyContent(bodyContent);
+        parent.getTag().setBodyContent(new MockBodyContent("", new StringWriter()));
         JsonArrayTagBuilder childArrayParent = parent.appendEntryTag().withName("testEntries").appendArrayTag();
 
         parent = childArrayParent.appendObjectTag();
         parent.appendEntryTag().withName("testFloat1").withValue("2.1").withType(JsonEntryType.FLOAT);
         parent.appendEntryTag().withName("testFloat2").withValue("2.2").withType(JsonEntryType.FLOAT);
+        parent.appendEntryTag().withName("testFloat3").withTagContent(new MockBodyContent("[{\"testFloat3\":\"2.3\"}]", new StringWriter()));
         parent = childArrayParent.appendObjectTag();
         parent.appendEntryTag().withName("testFloat1").withValue("3.1").withType(JsonEntryType.FLOAT);
         parent.appendEntryTag().withName("testFloat2").withValue("3.2").withType(JsonEntryType.FLOAT);
-        bodyContent = new MockBodyContent("[{\"testFloat3\":\"3.3\"}]", new StringWriter());
-        childArrayParent.getTag().setBodyContent(bodyContent);
+        childArrayParent.getTag().setBodyContent(new MockBodyContent("[{\"testFloat3\":\"3.3\"}]", new StringWriter()));
 
         tagBuilder.invokeTags();
 
+        System.out.println(mockPageContext.getContentAsString());
         JSONArray result = new JSONArray(mockPageContext.getContentAsString());
 
         Assert.assertEquals(2, result.length());
@@ -78,6 +77,7 @@ public class JsonTagsTest extends TestCase {
         Assert.assertEquals(3, result.getJSONObject(1).optJSONArray("testEntries").length());
         Assert.assertEquals(2.1d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(0).getDouble("testFloat1"), 0.0d);
         Assert.assertEquals(2.2d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(0).getDouble("testFloat2"), 0.0d);
+        Assert.assertEquals(1, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(0).getJSONArray("testFloat3").length());
         Assert.assertEquals(3.1d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(1).getDouble("testFloat1"), 0.0d);
         Assert.assertEquals(3.2d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(1).getDouble("testFloat2"), 0.0d);
         Assert.assertEquals(3.3d, result.getJSONObject(1).optJSONArray("testEntries").getJSONObject(2).getDouble("testFloat3"), 0.0d);

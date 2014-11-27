@@ -9,16 +9,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonArrayTag extends AbstractJsonTag implements JsonObjectParentTag {
+@SuppressWarnings("serial")
+public class JsonArrayTag extends AbstractJsonObjectParentTag {
 
     private JSONArray jsonArray;
-    private Object oldEnclosing;
 
     @Override
     public int doStartTag() throws JspException {
+        pushStack();
         jsonArray = new JSONArray();
-        oldEnclosing = pageContext.getRequest().getAttribute(ENCLOSING_JSON_OBJECT);
-        pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, this);
         return EVAL_BODY_BUFFERED;
     }
 
@@ -30,7 +29,7 @@ public class JsonArrayTag extends AbstractJsonTag implements JsonObjectParentTag
                 try {
                     String body = bodyContent.getString().trim();
                     if (body.length() > 1) {
-                        JSONArray bodyJson = new JSONArray(bodyContent.getString());
+                        JSONArray bodyJson = new JSONArray(body);
                         for (int i = 0; i < bodyJson.length(); i++) {
                             jsonArray.put(bodyJson.get(i));
                         }
@@ -40,8 +39,8 @@ public class JsonArrayTag extends AbstractJsonTag implements JsonObjectParentTag
                 }
             }
             // if has parent, add object there, else render json string to page
-            JsonEntryTag parentTag = null;
-            if (getParent() != null && (parentTag = (JsonEntryTag) findAncestorWithClass(this, JsonEntryTag.class)) != null) {
+            JsonEntryTag parentTag = findParentTag(JsonEntryTag.class);
+            if (parentTag != null) {
                 // parents of JsonObjectTag or JsonArrayTag need to be used
                 parentTag.setValue(jsonArray);
             } else {
@@ -56,15 +55,15 @@ public class JsonArrayTag extends AbstractJsonTag implements JsonObjectParentTag
             return EVAL_PAGE;
         } finally {
             release();
-            pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, oldEnclosing);
+            popStack();
         }
     }
 
     @Override
     public void setJsonObject(JSONObject jsonObject) {
-        if (jsonObject.length() > 0) {
+        //if (jsonObject.length() > 0) {
             jsonArray.put(jsonObject);
-        }
+        //}
     }
 
     public JSONArray getJsonArray() {

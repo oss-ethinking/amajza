@@ -9,16 +9,15 @@ import javax.servlet.jsp.tagext.BodyContent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@SuppressWarnings("serial")
 public class JsonObjectTag extends AbstractJsonTag {
 
     private JSONObject jsonObject;
-    private Object oldEnclosing;
 
     @Override
     public int doStartTag() throws JspException {
         jsonObject = new JSONObject();
-        oldEnclosing = pageContext.getRequest().getAttribute(ENCLOSING_JSON_OBJECT);
-        pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, this);
+        pushStack();
         return EVAL_BODY_BUFFERED;
     }
 
@@ -44,10 +43,7 @@ public class JsonObjectTag extends AbstractJsonTag {
                 }
             }
             // if has parent, add object there, else render json string to page
-            JsonObjectParentTag parentTag = (JsonObjectParentTag) findAncestorWithClass(this, JsonObjectParentTag.class);
-            if (parentTag == null && oldEnclosing instanceof JsonObjectParentTag) {
-                parentTag = (JsonObjectParentTag) oldEnclosing;
-            }
+            AbstractJsonObjectParentTag parentTag = findParentTag(AbstractJsonObjectParentTag.class);
             if (parentTag != null) {
                 // parents of JsonObjectTag or JsonArrayTag need to be used
                 parentTag.setJsonObject(jsonObject);
@@ -63,7 +59,7 @@ public class JsonObjectTag extends AbstractJsonTag {
             return EVAL_PAGE;
         } finally {
             release();
-            pageContext.getRequest().setAttribute(ENCLOSING_JSON_OBJECT, oldEnclosing);
+            popStack();
         }
     }
 
