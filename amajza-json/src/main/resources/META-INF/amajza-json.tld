@@ -15,6 +15,33 @@
         <name>object</name>
         <tag-class>de.ethinking.amajza.json.tags.JsonObjectTag</tag-class>
         <body-content>JSP</body-content>
+        <attribute>
+            <description>
+                Optional page context variable name to put the JSON object 
+            </description>
+            <name>var</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            Store child JSON object into a variable
+        </description>
+        <name>set</name>
+        <tag-class>de.ethinking.amajza.json.tags.JsonSetTag</tag-class>
+        <body-content>JSP</body-content>
+        <attribute>
+            <description>
+                Page context variable name to put the JSON object 
+            </description>
+            <name>var</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
     </tag>
 
     <tag>

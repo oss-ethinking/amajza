@@ -13,6 +13,7 @@ import org.json.JSONObject;
 public class JsonObjectTag extends AbstractJsonTag {
 
     private JSONObject jsonObject;
+    private String var;
 
     @Override
     public int doStartTag() throws JspException {
@@ -42,18 +43,30 @@ public class JsonObjectTag extends AbstractJsonTag {
                     LOG.error("failed in JSON object body: " + bodyContent.getString(), e);
                 }
             }
-            // if has parent, add object there, else render json string to page
-            AbstractJsonObjectParentTag parentTag = findParentTag(AbstractJsonObjectParentTag.class);
-            if (parentTag != null) {
-                // parents of JsonObjectTag or JsonArrayTag need to be used
-                parentTag.setJsonObject(jsonObject);
+            if (var != null) {
+                if (jsonObject.length()>0) {
+                    LOG.debug("setting value for var [" + var + "]: " + jsonObject.toString());
+                    pageContext.setAttribute(var, jsonObject);
+                } else {
+                    LOG.debug("skipping value for var [" + var + "]");
+                    pageContext.removeAttribute(var);
+                }
             } else {
-                try {
-                    pageContext.getOut().print(jsonObject.toString(4));
-                } catch (JSONException e) {
-                    throw new JspException(e);
-                } catch (IOException e) {
-                    throw new JspException(e);
+                // if has parent, add object there, else render json string to page
+                AbstractJsonObjectParentTag parentTag = findParentTag(AbstractJsonObjectParentTag.class);
+                if (parentTag != null) {
+                    // parents of JsonObjectTag or JsonArrayTag need to be used
+                    LOG.debug("setting value for parent: " + jsonObject.toString());
+                    parentTag.setJsonObject(jsonObject);
+                } else {
+                    try {
+                        LOG.debug("writing value to page: " + jsonObject.toString());
+                        pageContext.getOut().print(jsonObject.toString(4));
+                    } catch (JSONException e) {
+                        throw new JspException(e);
+                    } catch (IOException e) {
+                        throw new JspException(e);
+                    }
                 }
             }
             return EVAL_PAGE;
@@ -65,5 +78,15 @@ public class JsonObjectTag extends AbstractJsonTag {
 
     public JSONObject getJsonObject() {
         return jsonObject;
+    }
+
+    public void setVar(String var) {
+        this.var = var;
+    }
+
+    @Override
+    public void release() {
+        super.release();
+        var = null;
     }
 }

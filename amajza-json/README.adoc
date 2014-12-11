@@ -17,6 +17,10 @@ Optional entry type can be specified: BOOLEAN, STRING, NUMBER, FLOAT.
 
 Define an entry's value to be an array of objects, or a root array. Body can be <json:object>'s.
 
+==== <json:set>
+
+Store a child <json:object> value into a variable and not into a possible parent.
+
 === Example
 
 [source,xml]
