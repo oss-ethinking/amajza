@@ -71,6 +71,14 @@ public class JsonEntryTag extends AbstractJsonObjectParentTag {
                             break;
                         }
                     } else {
+                        if (parse && value instanceof String) {
+                            String s = (String)value;
+                            if (s.startsWith("{")) {
+                                value = new JSONObject(s);
+                            } else if (s.startsWith("[")) {
+                                value = new JSONArray(s);
+                            }
+                        }
                         jsonObject.put(name, value);
                     }
                 } catch (Exception e) {
